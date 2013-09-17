@@ -6,6 +6,21 @@
 ##                        Date : 29/08/13                          ##
 #####################################################################
 
+#######################  PARAMETERS  #########################
+##
+##
+[CmdletBinding()]
+Param(
+    [Parameter(Mandatory=$False)]
+    [String]$BrokerAdress,
+
+    [Parameter(Mandatory=$False,Position=1)]
+    [String]$BBPath,
+
+    [Parameter(Mandatory=$False)]
+    [switch]$AddMandatoryKeyword
+)
+
 
 #########################  INFOS #############################
 ##
@@ -17,12 +32,21 @@
 ##
 ## Please specify a XD7 broker hostname or IP adress : 
 ##
-       $BrokerAdress = "vsrv-194-par"
+if($BrokerAdress -eq $null){
+##
+       $BrokerAdress = "BrokerHostNameOrIPAdress"
+##
+}
 ##
 ## Do you want published applications to be automatically
-## displayed on StoreFront ? (KEYWORD=Auto)
+## displayed on StoreFront ? 
+## (KEYWORD=Auto)
+##
+if($AddMandatoryKeyword -eq $False){
 ##
        $AddMandatoryKeyword = $False
+##
+}
 ##
 ## [Optional] SCRIPT PARAM : Path to building block file
 ##
@@ -61,19 +85,17 @@ function IsBuildingBlock {
 
 #####################  SCRIPT  #######################
 
-$bbPath = $null
 
-#Argument ?
-if($args.Length -eq 1){
+if($BBPath -ne ""){
 
     #Le chemin du Buiding Block a été passé en argument.
     #On teste si le chemin est valide
-    if(Test-Path $args[0]){
+    if(Test-Path $BBPath){
 
         #Chemin valide, on teste le fichier XML
-        if(IsBuildingBlock($args[0])){
+        if(IsBuildingBlock($BBPath)){
 
-            $bbPath = $args[0]
+            #Ok
 
         } else {
 
@@ -99,16 +121,16 @@ if($args.Length -eq 1){
         #test du fichier xml
         if(IsBuildingBlock($xmlFile.FullName)){
             
-            $bbPath = $xmlFile.FullName
+            $BBPath = $xmlFile.FullName
             break
 
         }
     }
     
     #Un fichier BB a t'il été trouvé ?
-    if($bbPath -eq $null){
+    if($BBPath -eq ""){
 
-        throw "No building block file found in the script folder. Try to specify a BB path as argument."
+        throw "No building block file found in the script folder. Try to specify a BB path as argument (BBPath)."
 
     }
 }
